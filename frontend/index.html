@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eredivisie Standing</title>
+    <style>
+      body {
+        background-color: #111;
+        color: #eee;
+        border-color: #eee;
+        font-family: "Courier New", Courier, monospace;
+        padding-top: 20vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: min(2.5vw, 1.5rem);
+      }
+
+      .typing-text h1 {
+        overflow: hidden;
+        border-right: 0.15em solid #eee;
+        white-space: nowrap;
+        margin: 0 auto;
+        letter-spacing: 0.15em;
+        animation: typing 0.25s steps(10, end),
+          blink-caret 1s step-end 0.25s infinite;
+      }
+
+      @keyframes typing {
+        from {
+          width: 0;
+        }
+        to {
+          width: 100%;
+        }
+      }
+
+      @keyframes blink-caret {
+        from,
+        to {
+          border-color: transparent;
+        }
+        50% {
+          border-color: #eee;
+        }
+      }
+
+      .fade-in-pulse {
+        animation: fadeIn 0.25s ease-in forwards, pulse 1s ease-in-out infinite;
+        animation-delay: 0.25s, 0s;
+        margin-top: 1em;
+      }
+
+      @keyframes fadeIn {
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      table {
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border: 1px solid #eee;
+        padding: 10px;
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- show the loading screen until the data is fetched -->
+    <div class="typing-text fade-in-pulse" id="loading">
+      <h1 id="loading-text">Loading...</h1>
+    </div>
+
+    <!-- the score data is inserted into this table -->
+    <div style="display: none" id="data">
+      <h2>Eredivisie Standing</h2>
+      <table id="data-table">
+        <thead>
+          <tr>
+            <th>Ranking</th>
+            <th>Name</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- data rows will be inserted here when fetched -->
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      // try fetching the data from the API (prevent caching to always get new data)
+      const apiUrl = "http://127.0.0.1:5000/";
+      const noCacheUrl = apiUrl + "?t=" + Date.now();
+
+      fetch(noCacheUrl, { cache: "no-store" })
+        .then((response) => {
+          // json load the data
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          // sleep for a little bit so we can enjoy the nice loading animation :)
+          return sleep(567).then(() => data);
+        })
+        .then((data) => {
+          // add the rows to the table
+          const tbody = document.querySelector("#data-table tbody");
+          data.forEach((item) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${item.ranking}</td>
+              <td>${item.name}</td>
+              <td>${item.score}</td>
+            `;
+            tbody.appendChild(row);
+          });
+          // make the table visible and the loading screen invisible
+          const table = document.querySelector("#data");
+          const loading = document.querySelector("#loading");
+          table.setAttribute("style", "display: block");
+          loading.setAttribute("style", "display: none");
+        })
+        .catch((error) => {
+          console.error("Error fetching the JSON:", error);
+          // also update the loading text with error
+          const loading_text = document.querySelector("#loading-text");
+          loading_text.innerHTML = "Error loading data!<br>Try again later";
+        });
+    </script>
+  </body>
+</html>

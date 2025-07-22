@@ -1,0 +1,6 @@
+# expose the frontend on HTTP port 8000
+:8000 {
+	root * /srv/frontend
+	try_files {path} /index.html
+	file_server
+}

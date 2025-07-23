@@ -1,0 +1,17 @@
+services:
+  eredivisie-standing-api:
+    image: hetorusnl/eredivisie-standing-api
+    restart: unless-stopped
+    volumes:
+      - ./scores:/app/scores
+    env_file: eredivisie-standing.env
+    ports:
+      - 8130:5000 # exposes the API on port 8130 on the host
+
+  eredivisie-standing-frontend:
+    image: hetorusnl/eredivisie-standing-frontend
+    restart: unless-stopped
+    volumes:
+      - ./config.js:/srv/frontend/config.js
+    ports:
+      - 8131:8000 # exposes the frontend on port 8131 on the host

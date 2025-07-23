@@ -104,7 +104,11 @@
     </div>
 
     <!-- load the custom apiUrl -->
-    <script src="./config.js"></script>
+    <script>
+      document.write(
+        '<script src="./config.js?t=' + Date.now() + '"><\/script>'
+      );
+    </script>
 
     <script>
       function sleep(ms) {

@@ -103,13 +103,15 @@
       </table>
     </div>
 
+    <!-- load the custom apiUrl -->
+    <script src="./config.js"></script>
+
     <script>
       function sleep(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
       }
 
       // try fetching the data from the API (prevent caching to always get new data)
-      const apiUrl = "http://127.0.0.1:5000/";
       const noCacheUrl = apiUrl + "?t=" + Date.now();
 
       fetch(noCacheUrl, { cache: "no-store" })
